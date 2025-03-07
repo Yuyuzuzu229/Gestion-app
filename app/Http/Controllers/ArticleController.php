@@ -26,7 +26,7 @@ class ArticleController extends Controller
     {
         // Validation des données
         $validated = $request->validate([
-            'titre' => 'required|string|max:255', // Le titre est requis
+            'titre' => 'required|string|max:255',
             'description' => 'required|string',
             'context' => 'required|string',
             'instruction' => 'required|string',
@@ -63,13 +63,12 @@ class ArticleController extends Controller
     public function edit($id)
     {
         $article = Article::findOrFail($id);
-        return view('articles.edit', compact('article')); // Assure-toi que la vue `edit` existe
+        return view('articles.edit', compact('article'));
     }
 
     // Met à jour un article existant
     public function update(Request $request, $id)
     {
-        // Validation des données
         $validated = $request->validate([
             'titre' => 'required|string|max:255',
             'description' => 'required|string',
@@ -77,40 +76,46 @@ class ArticleController extends Controller
             'instruction' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
-    
-        // Trouver l'article
-        $article = Article::findOrFail($id);
 
-        // Gestion de l'image (si elle existe)
-        if ($request->hasFile('image')) {
-            // Supprimer l'ancienne image si elle existe
-            if ($article->image) {
-                Storage::delete('public/' . $article->image);
-            }
-            
-            // Sauvegarder la nouvelle image
-            $imagePath = $request->file('image')->store('articles', 'public');
-            $article->image = $imagePath;
-        }
-    
-        // Mise à jour des champs
+        $article = Article::findOrFail($id);
         $article->titre = $validated['titre'];
         $article->description = $validated['description'];
         $article->context = $validated['context'];
         $article->instruction = $validated['instruction'];
-    
+
+        if ($request->hasFile('image')) {
+            // Supprime l'image précédente si elle existe
+            if ($article->image && Storage::exists('public/' . $article->image)) {
+                Storage::delete('public/' . $article->image);
+            }
+
+            // Enregistre la nouvelle image
+            $article->image = $request->file('image')->store('articles', 'public');
+        }
+
         $article->save();
-    
-        // Redirection vers la page de liste des articles
+
         return redirect()->route('articles.index')->with('success', 'Article mis à jour avec succès !');
     }
 
-    // Méthode pour générer le PDF (à définir selon tes besoins)
+    // Supprime un article
+    public function destroy($id)
+    {
+        $article = Article::findOrFail($id);
+        // Supprime l'image si elle existe
+        if ($article->image && Storage::exists('public/' . $article->image)) {
+            Storage::delete('public/' . $article->image);
+        }
+        $article->delete();
+
+        return redirect()->route('articles.index')->with('success', 'Article supprimé avec succès !');
+    }
+
+    // Génère un fichier PDF
     public function generatePDF($id)
     {
         $article = Article::findOrFail($id);
-
-        // Ici, tu devras utiliser une bibliothèque comme `dompdf` ou `barryvdh/laravel-dompdf`
-        // pour générer un PDF à partir des données de l'article.
+        $pdf = \PDF::loadView('articles.pdf', compact('article'));
+        return $pdf->download('article-' . $article->titre . '.pdf');
     }
 }

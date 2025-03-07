@@ -5,60 +5,105 @@
     body {
         background: url('{{ asset('wo.jpg') }}') no-repeat center center fixed;
         background-size: cover;
+        font-family: 'Arial', sans-serif;
     }
-    .card {
-        background: rgba(255, 255, 255, 0.9);
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+
+    .form-container {
+        max-width: 500px;
+        margin: auto;
+        background: rgba(255, 255, 255, 0.85);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-container h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        height: 45px;
+        font-size: 16px;
+    }
+
+    .form-control.textarea {
+        height: 120px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        padding: 10px 20px;
+        width: 100%;
+        font-size: 18px;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+
+    .image-preview {
+        max-width: 200px;
+        margin-top: 20px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
     }
 </style>
 
 <div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <h2 class="text-center mb-4">Éditer un Article</h2>
-                <form action="{{ route('articles.update', $article->id) }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
+    <div class="form-container">
+        <h2>Éditer un Article</h2>
 
-                    <div class="form-group mb-3">
-                        <label for="titre" class="form-label">Titre</label>
-                        <input type="text" class="form-control" id="titre" name="titre" value="{{ old('titre', $article->titre) }}" required>
-                    </div>
+        <form action="{{ route('articles.update', $article->id) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
 
-                    <div class="form-group mb-3">
-                        <label for="description" class="form-label">Description</label>
-                        <textarea name="description" id="description" class="form-control" rows="3" required>{{ old('description', $article->description) }}</textarea>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label for="context" class="form-label">Contexte</label>
-                        <textarea name="context" id="context" class="form-control" rows="3" required>{{ old('context', $article->context) }}</textarea>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label for="instruction" class="form-label">Instruction</label>
-                        <textarea name="instruction" id="instruction" class="form-control" rows="3" required>{{ old('instruction', $article->instruction) }}</textarea>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label for="image" class="form-label">Choisir une nouvelle image (facultatif)</label>
-                        <input type="file" name="image" id="image" class="form-control" accept="image/*">
-                    </div>
-
-                    @if ($article->image)
-                        <div class="mb-3 text-center">
-                            <p>Image actuelle :</p>
-                            <img src="{{ asset('storage/' . $article->image) }}" alt="Image de l'article" class="img-thumbnail" style="max-width: 200px;">
-                        </div>
-                    @endif
-
-                    <button type="submit" class="btn btn-success w-100">Mettre à jour</button>
-                </form>
+            <div class="form-group">
+                <label for="titre">Titre</label>
+                <input type="text" name="titre" id="titre" class="form-control" value="{{ old('titre', $article->titre) }}" required>
             </div>
-        </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea name="description" id="description" class="form-control textarea" required>{{ old('description', $article->description) }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="context">Contexte</label>
+                <textarea name="context" id="context" class="form-control textarea" required>{{ old('context', $article->context) }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="instruction">Instruction</label>
+                <textarea name="instruction" id="instruction" class="form-control textarea" required>{{ old('instruction', $article->instruction) }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="image">Choisir une nouvelle image (facultatif)</label>
+                <input type="file" name="image" id="image" class="form-control" accept="image/*">
+            </div>
+
+            @if ($article->image)
+                <div class="form-group">
+                    <label>Image actuelle</label>
+                    <img src="{{ asset('storage/' . $article->image) }}" alt="Image de l'article" class="img-thumbnail image-preview">
+                </div>
+            @endif
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Mettre à jour l'Article</button>
+            </div>
+        </form>
     </div>
 </div>
 

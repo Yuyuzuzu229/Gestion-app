@@ -1,5 +1,4 @@
 <?php
-
 use App\Http\Controllers\ArticleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -23,10 +22,8 @@ Route::get('/articles/{id}/pdf', [ArticleController::class, 'generatePDF'])->nam
 // Routes d'authentification
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
-
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
-
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Redirection vers la page 'liste' après connexion réussie
@@ -37,3 +34,8 @@ Route::post('/logout', function () {
     Auth::logout();
     return redirect('/login');
 })->name('logout');
+
+// Vérification de l'authentification de l'utilisateur
+Route::get('/check-auth', function () {
+    return response()->json(['authenticated' => Auth::check()]);
+});
